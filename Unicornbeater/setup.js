@@ -8,6 +8,13 @@ game,
 type,
 unicornHP,
 dealDamage,
+buyDoubler,
+buyCoinUpgrade,
+wealthEffect,
+strengthEffect,
+salesEffect,
+weaknessEffect,
+luckEffect
 }
 })
 

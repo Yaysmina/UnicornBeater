@@ -13,57 +13,53 @@
 <body>
 <div id="vue">
 <br>
-<div class="unicornLvlKleur"> {{ type() }} unicorn <div class="placeholder"></div> lvl {{ game.levels+1 }} </div>
+<div class="unicornLvlKleur"> {{ type() }} unicorn <div class=""></div> lvl {{ game.levels+1 }} </div>
 <div class="centrr"><progress id="Health" :value="  (unicornHP()-game.damageDealt)/unicornHP()*100 " max="100"></progress></div>
-HP: {{ unicornHP()-game.damageDealt }}> / {{ unicornHP() }}> <br>
-DPS: <span id="DPS"></span> <span id="Strength"></span>
+HP: {{ unicornHP()-game.damageDealt }} / {{ unicornHP() }} <br>
+DPS: {{ Math.floor((1 + strengthEffect(player.heroes[1]) / 100)*player.upgrades.dps*(player.upgrades.dps+1)/2) }}</span>
 <img id="assUnicorn" @click="dealDamage(0)" src="images/common.png" alt="">
 <button id="DealDamage" @click="dealDamage(0)"> Spank {{ 1+player.upgrades.click }} HP away from the Unicorn</button>
 <br>
-Coins: <span id="Coins"></span> <br>
-Rainbow hair: <span id="RainbowHair"></span> <br>
-Horns: <span id="Horns"></span>
+Coins: {{ player.coins }} <br>
+Rainbow hair: {{ player.rainbowHair }} <br>
+Horns: {{ player.horns }}
 <br>
 <br>
 
-<div id="buymax">
-<button id="MaxBuy" onclick="toggleMaxBuy()"> <span id="MaxBuyText"></span> </button> <br>
-</div>
 
-<div id="damage">
-<button id="IncreaseDPC" onclick="increaseDPC()"> Spank 1 HP more per click for <span
-id="IncreaseDPCcost"></span> Coins</button> <br>
-<button id="IncreaseDPS" onclick="increaseDPS()"> Increase base DPS by <span id="IncreaseDPSeffect"></span> for
-<span id="IncreaseDPScost"></span> Coins</button> <br>
+
+<div v-if="player.unlocks.coins" id="damage">
+<button id="MaxBuy" onclick="toggleMaxBuy()"> Toggle max buy: {{ player.maxBuy }} </button> <br>
+<button id="IncreaseDPC" onclick="buyCoinUpgrade(0)"> Spank 1 HP more per click for {{ player.upgrades.dps+1 }} for {{ Math.round(Math.pow((player.upgrades.click + 1), salesEffect(player.heroes[2]))) }} Coins</button> <br>
+<button id="IncreaseDPS" onclick="buyCoinUpgrade(1)"> Increase base DPS by {{ Math.round(Math.pow((player.upgrades.dps + 1), salesEffect(player.heroes[2]))) }}  Coins</button> <br>
 <br>
 <br>
 </div>
-<div id="autobuy">
+<div v-if="false" id="autobuy">
 <button id="AutoBuy" onclick="toggleAutoBuy()"> <span id="AutoBuyText"></span> </button> <button id="AutoBuy2" onclick="chooseAutoBuy()"> <span id="AutoBuyText2"></span> </button> <br>
 </div>
-<div id="upgrades">
-<button id="CoinButton" onclick="doubleCoinGain()"> ×2 Coins gain for <span id="DoubleCoinGainCost"></span>
+<div v-if="player.unlocks.rainbowHair" id="upgrades">
+<button id="CoinButton" onclick="buyDoubler(0)"> ×2 Coins gain for {{ 2*2**player.hairUpgrades[0] }}
 Rainbow Hair</button>
-Mult: x<span id="CoinGain"></span> <span id="BonusCoins"></span> <br>
+Mult: x {{ 2**player.hairUpgrades[0] }} <br>
 
-<button id="RainbowHairButton" onclick="doubleRainbowHairGain()"> ×2 RainbowHair gain for <span
-id="DoubleRainbowHairGainCost"></span> Rainbow Hair</button>
-Mult: x<span id="RainbowHairGain"></span> <br>
+<button id="RainbowHairButton" onclick="buyDoubler(1)"> ×2 Rainbow Hair gain for {{ game.rainbowHairGainCost }} Rainbow Hair</button>
+Mult: x {{ 2**player.hairUpgrades[1] }} <br>
 
-<button id="HornsButton" onclick="doubleHornsGain()"> ×2 Horns gain for <span id="DoubleHornsGainCost"></span>
-Rainbow Hair</button> Mult: x<span id="HornsGain"></span> <br>
+<button id="HornsButton" onclick="buyDoubler(2)"> ×2 Horns gain for {{ 8*3**player.hairUpgrades[2] }}
+Rainbow Hair</button> Mult: x {{ 2**player.hairUpgrades[2] }} <br>
 <br>
 <br>
 </div>
 
-<div id="lootbox">
+<div v-if="player.unlocks.horns" id="lootbox">
 <button id="LootBox" onclick="buyLootBox()"> Buy a lootbox for <span id="LootBoxCost"></span> Horns</button>
 <button id="Prestige" onclick="prestige()"> <span id="PrestigeText"></span> </button> <br>
 <br>
 <br>
 </div>
 
-<div id="heroes">
+<div v-if="player.unlocks.heroes" id="heroes">
 Wealth (lvl <span id="WealthLvl"></span>): You gain <span id="WealthEffect"></span>% more coins <br><br>
 Strength (lvl <span id="StrengthLvl"></span>): You do <span id="StrengthEffect"></span>% more dps and dpc<br><br>
 Sales (lvl <span id="SalesLvl"></span>): Coin costs are raised to ^<span id="SalesEffect"></span><br><br>
@@ -79,5 +75,4 @@ Unicorns <br><br>
 <button id="HardReset" onclick="hardReset()"> Reset all progress</button> <br>
 </div>
 </body>
-
 </html>

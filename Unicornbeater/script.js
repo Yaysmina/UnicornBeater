@@ -1,19 +1,39 @@
 "use strict"
 
-const player = {
+const OP = {
 coins: 0,
 rainbowHair:0,
 horns:0,
-Damage:{click:0,second:0},
 heroes:[0,0,0,0,0],
-HairUpgrades:[0,0,0],
-upgrades:{click:0,dps:0}
+hairUpgrades:[0,0,0],
+upgrades:{click:0,dps:0},
+unlocks:{
+    coins: false,
+    rainbowHair: false,
+    horns: false,
+    heroes: false,
+},
+maxBuy: false
 }
 
-const game = {
+const OG = {
 levels: 0,
 damageDealt: 0,
+rainbowHairGainCost:4,
 }
+
+let copyObject = function(x){
+if(typeof x!=="object") return x
+let object = new x.constructor()
+for(let i in x){
+    object[i] = copyObject(x[i])
+}
+return object
+}
+
+let player = copyObject(OP)
+let game = copyObject(OG)
+
 
 const factorials = [1, 1, 2, 6, 24, 120, 720, 5040]
 const healthMults = [1, 2, 5, 10, 20, 40, 80]
@@ -27,24 +47,18 @@ let dpc = 1;
 let dps = 0;
 let dpcLvl = 0;
 let dpsLvl = 0;
-let maxBuy = false;
 let autoBuy = false;
 let autoBuyType = "Smart"
 
 let coins = 0;
-let rainbowHair = 0;
 let horns = 0;
 let coinGain = 1;
 let rainbowHairGain = 1;
 let hornsGain = 1;
 let luck = 4.5;
-let coinGainCost = 2;
-let rainbowHairGainCost = 4;
-let hornsGainCost = 8;
 
 let lootBoxCost = 5;
 let lootBoxes = 0;
-let unlock = 0;
 let heroNames = ["Hero of Wealth", "Hero of Strength", "Hero of Sales", "Hero of Weakness", "Hero of Luck"];
 let increaseDPCcost = Math.round(Math.pow((dpcLvl + 1), salesEffect(player.heroes[2])));
 let increaseDPScost = Math.round(Math.pow((dpsLvl + 1), salesEffect(player.heroes[2])));
@@ -82,75 +96,10 @@ let unicornHP = function(){
 
 function update() {
 
-    checkForUnlock();
     updateCoinGain();
 	dpc = Math.round((dpcLvl+1) * (1 + strengthEffect(player.heroes[1]) / 100));
-
-    document.querySelector("#UnicornHP").innerHTML = displayN(unicornHP());
-    document.querySelector("#CurrentHP").innerHTML = displayN(unicornHP()-game.damageDealt);
-    document.querySelector("#DPS").innerHTML = displayN(Math.round(dps * (1 + strengthEffect(player.heroes[1]) / 100)));
-    document.querySelector("#Strength").innerHTML = "";
     if (player.heroes[1] > 0) {
         document.querySelector("#Strength").innerHTML = "(" + displayN(dps) + " + " + displayN(Math.round(dps * strengthEffect(player.heroes[1]) / 100)) + ")";
-    }
-    document.querySelector("#BonusCoins").innerHTML = "";
-    if (player.heroes[0] > 0) {
-        document.querySelector("#BonusCoins").innerHTML = "(" + displayN((coinGainCost / 2)) + " + " + displayN(Math.round(coinGainCost * wealthEffect(player.heroes[0]) / 200)) + ")";
-    }
-    document.querySelector("#Coins").innerHTML = displayN(coins);
-    document.querySelector("#RainbowHair").innerHTML = displayN(rainbowHair);
-    document.querySelector("#Horns").innerHTML = displayN(horns);
-	document.querySelector("#MaxBuyText").innerHTML = "Max Buy: "+(maxBuy ? "ON" : "OFF");
-    document.querySelector("#IncreaseDPCcost").innerHTML = displayN(Math.round(Math.pow((dpcLvl + 1), salesEffect(player.heroes[2]))));
-    document.querySelector("#IncreaseDPScost").innerHTML = displayN(Math.round(Math.pow((dpsLvl + 1), salesEffect(player.heroes[2]))));
-    document.querySelector("#IncreaseDPSeffect").innerHTML = displayN(dpsLvl + 1);
-	document.querySelector("#AutoBuyText").innerHTML = "Auto Buy: " + (autoBuy ? "ON" : "OFF");
-	document.querySelector("#AutoBuyText2").innerHTML = "Type: " + autoBuyType;
-    document.querySelector("#DoubleCoinGainCost").innerHTML = displayN(coinGainCost);
-    document.querySelector("#DoubleRainbowHairGainCost").innerHTML = displayN(rainbowHairGainCost);
-    document.querySelector("#DoubleHornsGainCost").innerHTML = displayN(hornsGainCost);
-    document.querySelector("#CoinGain").innerHTML = displayN(coinGain);
-    document.querySelector("#RainbowHairGain").innerHTML = displayN(rainbowHairGain);
-    document.querySelector("#HornsGain").innerHTML = displayN(hornsGain);
-    document.querySelector("#LootBoxCost").innerHTML = displayN(lootBoxCost);
-    if (lootBoxes > 0) {
-        document.querySelector("#PrestigeText").innerHTML = "Reset your progress to open " + lootBoxes.toString() + " lootbox(es)!";
-    } else {
-        document.querySelector("#PrestigeText").innerHTML = "Buy at least one lootbox to prestige...";
-    }
-    document.querySelector("#WealthLvl").innerHTML = player.heroes[0];
-    document.querySelector("#StrengthLvl").innerHTML = player.heroes[1];
-    document.querySelector("#SalesLvl").innerHTML = player.heroes[2];
-    document.querySelector("#WeaknessLvl").innerHTML = player.heroes[3];
-    document.querySelector("#LuckLvl").innerHTML = player.heroes[4];
-    document.querySelector("#WealthEffect").innerHTML = displayN(wealthEffect(player.heroes[0]));
-    document.querySelector("#StrengthEffect").innerHTML = displayN(strengthEffect(player.heroes[1]));
-    document.querySelector("#SalesEffect").innerHTML = salesEffect(player.heroes[2]);
-    document.querySelector("#WeaknessEffect").innerHTML = weaknessEffect(player.heroes[3]);
-    document.querySelector("#LuckEffect").innerHTML = luckEffect(player.heroes[4]);
-
-    document.getElementById('damage').style.display = "none";
-    document.getElementById('upgrades').style.display = "none";
-    document.getElementById('lootbox').style.display = "none";
-    document.getElementById('heroes').style.display = "none";
-	document.getElementById('buymax').style.display = "none";
-	document.getElementById('autobuy').style.display = "none";
-    
-    if (unlock >= 1) {
-        document.getElementById('damage').style.display = "block";
-    }
-    if (unlock >= 2) {
-        document.getElementById('upgrades').style.display = "block";
-    }
-    if (unlock >= 3) {
-        document.getElementById('lootbox').style.display = "block";
-    }
-    if (unlock >= 4) {
-        document.getElementById('buymax').style.display = "block";
-		document.getElementById('heroes').style.display = "block";
-    }
-    if (unlock >= 5) {
-        document.getElementById('autobuy').style.display = "block";
     }
  
 }
@@ -161,16 +110,16 @@ function dealDamage(type) {
     damage = Math.floor((1 + strengthEffect(player.heroes[1]) / 100)*damage)
     game.damageDealt += damage;
     if (game.damageDealt >= unicornHP()) {
+        if ( unicornType>=0 ) player.unlocks.coins = true
+        if ( unicornType>=1 ) player.unlocks.rainbowHair = true
+        if ( unicornType>=2 ) player.unlocks.horns = true
 		if (unicornType == -1) {
 			godlyPrestige();
 			return;
 		}
         player.coins+=factorials[unicornType]*coinGain
-        coins+=factorials[unicornType]*coinGain
         player.rainbowHair+=(unicornType>=1?factorials[unicornType-1]:0)*rainbowHairGain
-        rainbowHair+=(unicornType>=1?factorials[unicornType-1]:0)*rainbowHairGain
         player.horns+=(unicornType>=2?factorials[unicornType-2]:0)*hornsGain
-        horns+=(unicornType>=2?factorials[unicornType-2]:0)*hornsGain
         game.levels++
         let HPmult = 1;
         unicornType = 0;
@@ -255,54 +204,44 @@ function getRandomhero() {
 	return Math.floor(Math.random() * 5) + 1;
 }
 
-function increaseDPC() {
-	if (maxBuy) {
- 		while (coins >= increaseDPCcost) {
-        	coins -= increaseDPCcost;
-        	dpcLvl++;
-        	increaseDPCcost = Math.round(Math.pow((dpcLvl + 1), salesEffect(player.heroes[2])));
-		}
-	}
-    if (coins >= increaseDPCcost) {
-        coins -= increaseDPCcost;
-        dpcLvl++;
-        increaseDPCcost = Math.round(Math.pow((dpcLvl + 1), salesEffect(player.heroes[2])));
-    }
+function buyCoinUpgrade(type){
+if(type==0){
+do{
+let cost = Math.round(Math.pow((player.upgrades.click + 1), salesEffect(player.heroes[2])));
+if(player.coins>=cost){
+player.coins-=cost
+player.upgrades.click++
+}
+}while(player.maxBuy&&player.coins>=Math.round(Math.pow((player.upgrades.click + 1), salesEffect(player.heroes[2]))))
 }
 
-function increaseDPS() {
-	if (maxBuy) {
-		while (coins >= increaseDPScost) {
-        	coins -= increaseDPScost;
-        	dpsLvl++;
-        	dps += dpsLvl;
-        	increaseDPScost = Math.round(Math.pow((dpsLvl + 1), salesEffect(player.heroes[2])));
-    	}
-	}
-    if (coins >= increaseDPScost) {
-        coins -= increaseDPScost;
-        dpsLvl++;
-        dps += dpsLvl;
-        increaseDPScost = Math.round(Math.pow((dpsLvl + 1), salesEffect(player.heroes[2])));
-    }
+if(type==1)
+do{
+let cost = Math.round(Math.pow((player.upgrades.dps + 1), salesEffect(player.heroes[2])));
+if(player.coins>=cost){
+player.coins-=cost
+player.upgrades.dps++
+}
+}while(player.maxBuy&&player.coins>=Math.round(Math.pow((player.upgrades.dps + 1), salesEffect(player.heroes[2]))))
+
 }
 
 function toggleMaxBuy() {
-	maxBuy = maxBuy ? false : true;
+	player.maxBuy = !player.maxBuy
 }
 
 function buyAuto() {
 	if (autoBuy) {
 		if (autoBuyType == "Rainbow Hair") {
-			doubleRainbowHairGain();
+			doubleplayer.rainbowHairGain();
 		}
 		else if (autoBuyType == "Horns") {
 			doubleHornsGain();
 		}
 		else if (autoBuyType == "Smart") { 
 			doubleHornsGain();
-			doubleRainbowHairGain();
-			if (rainbowHair >= 5 * coinGainCost) {
+			doubleplayer.rainbowHairGain();
+			if (player.rainbowHair >= 5 * coinGainCost) {
 				doubleCoinGain();
 			}
 		}		
@@ -320,29 +259,29 @@ function toggleAutoBuy() {
 	autoBuy = autoBuy ? false : true;
 }
 
-function doubleCoinGain() {
-    if (rainbowHair >= coinGainCost) {
-        rainbowHair -= coinGainCost;
-        coinGainCost *= 2;
+function buyDoubler(type){
+if(type==0){
+    if (player.rainbowHair >= 2*2**player.hairUpgrades[0]) {
+        player.rainbowHair -= 2*2**player.hairUpgrades[0];
+        player.hairUpgrades[0]++
     }
 }
-
-function doubleRainbowHairGain() {
-    if (rainbowHair >= rainbowHairGainCost) {
-        rainbowHair -= rainbowHairGainCost;
-        rainbowHairGainCost *= 3;
-		if (rainbowHairGainCost > 100) {rainbowHairGainCost *= 1 + Math.floor(Math.log10(rainbowHairGainCost))/10};
-		rainbowHairGainCost = Math.round(rainbowHairGainCost);
-        rainbowHairGain *= 2;
+if(type==1){
+    if (player.rainbowHair >= game.rainbowHairGainCost) {
+        player.rainbowHair -= game.rainbowHairGainCost;
+        game.rainbowHairGainCost *= 3;
+		if (game.rainbowHairGainCost > 100) {game.rainbowHairGainCost *= 1 + Math.floor(Math.log10(game.rainbowHairGainCost))/10};
+		game.rainbowHairGainCost = Math.round(game.rainbowHairGainCost);
+        player.rainbowHairGain *= 2;
+        player.hairUpgrades[1]++
+    }    
+}
+if(type==2){
+    if (player.rainbowHair >= 8*3**player.hairUpgrades[2]) {
+        player.rainbowHair -= 8*3**player.hairUpgrades[2];
+        player.hairUpgrades[2]++
     }
 }
-
-function doubleHornsGain() {
-    if (rainbowHair >= hornsGainCost) {
-        rainbowHair -= hornsGainCost;
-        hornsGainCost = hornsGainCost*3;
-        hornsGain *= 2;
-    }
 }
 
 function buyLootBox() {
@@ -353,20 +292,8 @@ function buyLootBox() {
     }
 }
 
-function checkForUnlock() {
-    if (unlock == 0 && coins >= 6) {
-        unlock = 1;
-    }
-    if (unlock == 1 && rainbowHair >= 4) {
-        unlock = 2;
-    }
-    if (unlock == 2 && horns >= 3) {
-        unlock = 3;
-    }
-}
-
 function updateCoinGain() {
-    coinGain = coinGainCost / 2;
+    coinGain = 2**player.hairUpgrades[0];
     coinGain = Math.round(coinGain * (1 + wealthEffect(player.heroes[0]) / 100));
 }
 
@@ -384,10 +311,10 @@ function heal() {
 
 function prestige() {
     if (lootBoxes > 0) {
-        unlock = 4;
+        player.unlocks.heroes = true
         while (lootBoxes > 0) {
             lootBoxes--;
-            rng = Math.random();
+            let rng = Math.random();
             unicorn = 0;
             if (rng < 0.20) {
                 unicorn = 0;
@@ -413,12 +340,10 @@ function prestige() {
             dpcLvl = 0;
             dpsLvl = 0;
             coins = 0;
-            rainbowHair = 0;
-            rainbowHairGain = 1;
+            player.rainbowHair = 0;
+            player.rainbowHairGain = 1;
             hornsGain = 1;
-            coinGainCost = 2;
-            rainbowHairGainCost = 4;
-            hornsGainCost = 8;
+            game.rainbowHairGainCost = 4;
             increaseDPCcost = Math.round(Math.pow((dpcLvl + 1), salesEffect(player.heroes[2])));
             increaseDPScost = Math.round(Math.pow((dpsLvl + 1), salesEffect(player.heroes[2])));
         }
@@ -426,7 +351,6 @@ function prestige() {
 }
 
 function godlyPrestige() {
-	unlock = 5;
 	
 	game.levels = 0;
 	game.damageDealt = 0;
@@ -436,20 +360,17 @@ function godlyPrestige() {
 	dps = 0;
 	dpcLvl = 0;
 	dpsLvl = 0;
-	maxBuy = false;
+	player.maxBuy = false;
 	coins = 0;
-	rainbowHair = 0;
+	player.rainbowHair = 0;
 	horns = 0;
 	coinGain = 1;
-	rainbowHairGain = 1;
+	player.rainbowHairGain = 1;
 	hornsGain = 1;
 	luck = 4.5;
-	coinGainCost = 2;
-	rainbowHairGainCost = 4;
-	hornsGainCost = 8;
+	game.rainbowHairGainCost = 4;
 	lootBoxCost = 5;
 	lootBoxes = 0;
-	unlock = 0;
 	player.heroes = [0, 0, 0, 0, 0];
 }
 
@@ -458,22 +379,19 @@ function save() {
 }
 
 function load() {
-    if (!localStorage.unicorn) return;
+    if (localStorage.unicorn){
     let info = JSON.parse(atob(localStorage.unicorn));
-    for(let item in info.game)
-    game[item] = info.game[item]
-    for(let item in info.player)
-    game[item] = info.player[item]
-
-    let increaseDPCcost = Math.round(Math.pow((dpcLvl + 1), salesEffect(player.heroes[2])));
-    let increaseDPScost = Math.round(Math.pow((dpsLvl + 1), salesEffect(player.heroes[2])));
+    game = copyObject(info.game)
+    player = copyObject(info.player)
+    }
 }
 
 function hardReset() {
     if (prompt("Type RESET if you want to reset all progress") == "RESET") {
-        let game = [1, 20, 20, "Common", 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 4.5, 2, 4, 8, 5, [0, 0, 0, 0, 0], 0, 0];
-        localStorage.unicorn = btoa(JSON.stringify(game));
-        load();
+        player = copyObject(OP)
+        game = copyObject(OG)
+        localStorage.unicorn = btoa(JSON.stringify({game,player}));
+        location.reload()
     }
 
 }
@@ -484,7 +402,7 @@ function displayN(n) {
     return c;
 }
 
-load();
+load()
 setInterval( () => save(), 33);
 setInterval( () => update(), 33);
 setInterval( () => dealDamage(1), 1000);
