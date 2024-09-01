@@ -5,7 +5,8 @@ coins: 0,
 rainbowHair:0,
 horns:0,
 Damage:{click:0,second:0},
-heroes:[0,0,0,0,0]
+heroes:[0,0,0,0,0],
+HairUpgrades:[0,0,0],
 }
 
 const game = {
@@ -47,6 +48,16 @@ let increaseDPScost = Math.round(Math.pow((dpsLvl + 1), salesEffect(heroLvls[2])
 
 let health = document.getElementById("Health");
 
+let factorial = function(x){
+let num = 1
+while(x){
+    num*=x
+    x--    
+}
+return num
+}
+
+const factorials=[1,1,2,6,24,120]
 
 function update() {
 
