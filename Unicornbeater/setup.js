@@ -1,6 +1,6 @@
 "use strict"
 
-import "./Vue" 
+import { createApp } from "./Vue.js" 
 
 const vue = createApp({
 data(){
