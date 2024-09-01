@@ -1,34 +1,47 @@
 "use strict"
 
-unicornLVL = 1;
-unicornHP = 20;
-currentHP = 20;
-unicornType = "Common Unicorn";
-HPmult = 1;
-dpc = 1;
-dps = 0;
-dpcLvl = 0;
-dpsLvl = 0;
-maxBuy = false;
-autoBuy = false;
-autoBuyType = "Smart"
+const player = {
+coins: 0,
+rainbowHair:0,
+horns:0,
+Damage:{click:0,second:0},
+heroes:[0,0,0,0,0]
+}
 
-coins = 0;
-rainbowHair = 0;
-horns = 0;
-coinGain = 1;
-rainbowHairGain = 1;
-hornsGain = 1;
-luck = 4.5;
-coinGainCost = 2;
-rainbowHairGainCost = 4;
-hornsGainCost = 8;
+const game = {
+Level: 0,
+
+}
+
+let unicornLVL = 1;
+let unicornHP = 20;
+let currentHP = 20;
+let unicornType = "Common Unicorn";
+let HPmult = 1;
+let dpc = 1;
+let dps = 0;
+let dpcLvl = 0;
+let dpsLvl = 0;
+let maxBuy = false;
+let autoBuy = false;
+let autoBuyType = "Smart"
+
+let coins = 0;
+let rainbowHair = 0;
+let horns = 0;
+let coinGain = 1;
+let rainbowHairGain = 1;
+let hornsGain = 1;
+let luck = 4.5;
+let coinGainCost = 2;
+let rainbowHairGainCost = 4;
+let hornsGainCost = 8;
 
 lootBoxCost = 5;
 lootBoxes = 0;
 unlock = 0;
 heroLvls = [0, 0, 0, 0, 0];
-heroNames = ["Hero of Wealth", "Hero of Strength", "Hero of Sales", "Hero of Weakness", "Hero of Luck"];
+let heroNames = ["Hero of Wealth", "Hero of Strength", "Hero of Sales", "Hero of Weakness", "Hero of Luck"];
 
 let health = document.getElementById("Health");
 
