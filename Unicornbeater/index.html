@@ -1,1 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width">
+<title>Unicorn Beater™</title>
+<link href="style.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<br>
+<div class="unicornLvlKleur"><span id="UnicornType"></span> <div class="placeholder"></div> lvl <span
+id="UnicornLVL"></span> </div>
+<div class="centrr"><progress id="Health" value="100" max="100"></progress></div>
+HP: <span id="CurrentHP"></span> / <span id="UnicornHP"></span> <br>
+DPS: <span id="DPS"></span> <span id="Strength"></span>
+<img id="assUnicorn" onclick="dealDamage(dpc)" src="https://cdn.discordapp.com/attachments/1063238220684460112/1278814572723048569/unicorn_ass-removebg-preview.png?ex=66d22c61&is=66d0dae1&hm=644816773ada5ee275415ec66f5e2130504a87694f3f9b9cb3b201337c3f5356&" alt="">
+<button id="DealDamage" onclick="dealDamage(dpc)"> Spank <span id="DPC"></span> HP away from the Unicorn</button>
+<br>
+Coins: <span id="Coins"></span> <br>
+Rainbow hair: <span id="RainbowHair"></span> <br>
+Horns: <span id="Horns"></span>
+<br>
+<br>
 
+<div id="buymax">
+<button id="MaxBuy" onclick="toggleMaxBuy()"> <span id="MaxBuyText"></span> </button> <br>
+</div>
+
+<div id="damage">
+<button id="IncreaseDPC" onclick="increaseDPC()"> Spank 1 HP more per click for <span
+id="IncreaseDPCcost"></span> Coins</button> <br>
+<button id="IncreaseDPS" onclick="increaseDPS()"> Increase base DPS by <span id="IncreaseDPSeffect"></span> for
+<span id="IncreaseDPScost"></span> Coins</button> <br>
+<br>
+<br>
+</div>
+<div id="autobuy">
+<button id="AutoBuy" onclick="toggleAutoBuy()"> <span id="AutoBuyText"></span> </button> <button id="AutoBuy2" onclick="chooseAutoBuy()"> <span id="AutoBuyText2"></span> </button> <br>
+</div>
+<div id="upgrades">
+<button id="CoinButton" onclick="doubleCoinGain()"> ×2 Coins gain for <span id="DoubleCoinGainCost"></span>
+Rainbow Hair</button>
+Mult: x<span id="CoinGain"></span> <span id="BonusCoins"></span> <br>
+
+<button id="RainbowHairButton" onclick="doubleRainbowHairGain()"> ×2 RainbowHair gain for <span
+id="DoubleRainbowHairGainCost"></span> Rainbow Hair</button>
+Mult: x<span id="RainbowHairGain"></span> <br>
+
+<button id="HornsButton" onclick="doubleHornsGain()"> ×2 Horns gain for <span id="DoubleHornsGainCost"></span>
+Rainbow Hair</button> Mult: x<span id="HornsGain"></span> <br>
+<br>
+<br>
+</div>
+
+<div id="lootbox">
+<button id="LootBox" onclick="buyLootBox()"> Buy a lootbox for <span id="LootBoxCost"></span> Horns</button>
+<button id="Prestige" onclick="prestige()"> <span id="PrestigeText"></span> </button> <br>
+<br>
+<br>
+</div>
+
+<div id="heroes">
+Wealth (lvl <span id="WealthLvl"></span>): You gain <span id="WealthEffect"></span>% more coins <br><br>
+Strength (lvl <span id="StrengthLvl"></span>): You do <span id="StrengthEffect"></span>% more dps and dpc<br><br>
+Sales (lvl <span id="SalesLvl"></span>): Coin costs are raised to ^<span id="SalesEffect"></span><br><br>
+Weakness (lvl <span id="WeaknessLvl"></span>): Unicorns are <span id="WeaknessEffect"></span>x stronger each lvl
+<br><br>
+Luck (lvl <span id="LuckLvl"></span>): You have a 1 in <span id="LuckEffect"></span> chance to get rarer
+Unicorns <br><br>
+<br>
+<br>
+</div>
+
+<br>
+<button id="HardReset" onclick="hardReset()"> Reset all progress</button> <br>
+<script src="main.js"></script>
+</body>
+
+</html>
