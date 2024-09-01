@@ -6,19 +6,18 @@
 <title>Unicorn Beater™</title>
 <link href="style.css" rel="stylesheet" type="text/css" />
 
-<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+<script src="../Vue.js" defer></script>
 <script src="script.js" defer></script>
-<script type="module" src="setup.js" defer></script>
+<script src="setup.js" defer></script>
 </head>
 <body>
-<div id="#vue">
+<div id="vue">
 <br>
-<div class="unicornLvlKleur"><span id="UnicornType"></span> <div class="placeholder"></div> lvl <span
-id="UnicornLVL"></span> </div>
-<div class="centrr"><progress id="Health" value="100" max="100"></progress></div>
+<div class="unicornLvlKleur"><span id="UnicornType"></span> <div class="placeholder"></div> lvl {{ game.levels+1 }} </div>
+<div class="centrr"><progress id="Health" value="100 " max="100"></progress></div>
 HP: <span id="CurrentHP"></span> / <span id="UnicornHP"></span> <br>
 DPS: <span id="DPS"></span> <span id="Strength"></span>
-<img id="assUnicorn" onclick="dealDamage(dpc)" src="https://cdn.discordapp.com/attachments/1063238220684460112/1278814572723048569/unicorn_ass-removebg-preview.png?ex=66d22c61&is=66d0dae1&hm=644816773ada5ee275415ec66f5e2130504a87694f3f9b9cb3b201337c3f5356&" alt="">
+<img id="assUnicorn" onclick="dealDamage(dpc)" src="images/common.png" alt="">
 <button id="DealDamage" onclick="dealDamage(dpc)"> Spank <span id="DPC"></span> HP away from the Unicorn</button>
 <br>
 Coins: <span id="Coins"></span> <br>

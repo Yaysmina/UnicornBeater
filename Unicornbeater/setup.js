@@ -1,11 +1,12 @@
 "use strict"
 
-import { createApp } from "vue" 
+//import { createApp } from "vue" 
 
-const vue = createApp({
+const vue = Vue.createApp({
 data(){
 return {
 player,
+game,
 wealthEffect,
 strengthEffect,
 salesEffect,

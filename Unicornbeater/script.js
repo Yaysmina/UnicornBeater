@@ -10,14 +10,14 @@ HairUpgrades:[0,0,0],
 }
 
 const game = {
-Levels: 0,
+levels: 0,
 
 }
 
 let unicornLVL = 1;
-let unicornHP = 20;
 let currentHP = 20;
-let unicornType = "Common Unicorn";
+let unicornType = 0;
+let godType = 0
 let HPmult = 1;
 let dpc = 1;
 let dps = 0;
@@ -57,17 +57,33 @@ while(x){
 return num
 }
 
-const factorials=[1,1,2,6,24,120]
+const types = ["Common","Uncommon","Rare","Epic","Legendary","Mythic","Exotic"]
+const factorials = [1, 1, 2, 6, 24, 120, 720, 5040]
+const healthMults = [1, 2, 5, 10, 20, 40, 80]
+const godHealthMults = [50,100]
+let unicornHP = function(){
+    let scaling = weaknessEffect(heroLvls[3]);
+    if(godType==0){
+        if (unicornLVL <= 100) {
+            return healthMults[unicornType] * Math.round(20 * Math.pow(scaling, unicornLVL));
+        }
+        else if (unicornLVL <= 250) {
+            return healthMults[unicornType] * Math.round(20 * Math.pow(scaling, unicornLVL + (unicornLVL-100)*(unicornLVL-99)/200));
+        }
+        else {
+            return healthMults[unicornType] * Math.round(20 * Math.pow(scaling, unicornLVL + (unicornLVL-100)*(unicornLVL-99)/100));
+        }
+    }
+    else return godHealthMults[godType] * Math.round(20 * Math.pow(scaling, unicornLVL + (unicornLVL-100)*(unicornLVL-99)/100));
+}
 
 function update() {
 
     checkForUnlock();
     updateCoinGain();
-	health.value = currentHP/unicornHP*100;
 	dpc = Math.round((dpcLvl+1) * (1 + strengthEffect(heroLvls[1]) / 100));
 
-    document.querySelector("#UnicornLVL").innerHTML = unicornLVL;
-    document.querySelector("#UnicornHP").innerHTML = displayN(unicornHP);
+    document.querySelector("#UnicornHP").innerHTML = displayN(unicornHP());
     document.querySelector("#CurrentHP").innerHTML = displayN(currentHP);
     document.querySelector("#DPC").innerHTML = displayN(dpc);
     document.querySelector("#DPS").innerHTML = displayN(Math.round(dps * (1 + strengthEffect(heroLvls[1]) / 100)));
@@ -142,82 +158,59 @@ function update() {
 function dealDamage(x) {
     currentHP -= x;
     if (currentHP <= 0) {
-		if (unicornType == "Godly Unicorn: the master of Cheese") {
+		if (unicornType == -1) {
 			godlyPrestige();
 			return;
 		}
-        if (unicornType == "Common Unicorn") {
-            coins += coinGain;
-        }
-        else if (unicornType == "Uncommon Unicorn") {
-            coins += coinGain * 2;
-            rainbowHair += rainbowHairGain;
-        }
-        else if (unicornType == "Rare Unicorn") {
-            coins += coinGain * 6;
-            rainbowHair += rainbowHairGain * 2;
-            horns += hornsGain;
-        }
-        else if (unicornType == "Epic Unicorn") {
-            coins += coinGain * 24;
-            rainbowHair += rainbowHairGain * 6;
-            horns += hornsGain * 2;
-        }
-        else if (unicornType == "Legendary Unicorn") {
-            coins += coinGain * 120;
-            rainbowHair += rainbowHairGain * 24;
-            horns += hornsGain * 6;
-        }
+        player.coins+=factorial[unicornType]*coinGain
+        coins+=factorial[unicornType]*coinGain
+        player.rainbowHair+=unicornType>=1?factorial[unicornType-1]:0
+        rainbowHair+=unicornType>=1?factorial[unicornType-1]:0
+        player.horns+=unicornType>=2?factorial[unicornType-2]:0
+        horns+=unicornType>=2?factorial[unicornType-2]:0
+        game.levels++
         unicornLVL++;
-        let scaling = weaknessEffect(heroLvls[3]);
         let HPmult = 1;
-        unicornType = "Common Unicorn";
+        unicornType = 0;
         luck = luckEffect(heroLvls[4]);
         if (unicornLVL % 25 == 0) {
             HPmult = 5;
-            unicornType = "Rare Unicorn";
+            unicornType = 2;
         }
         if (unicornLVL % 100 == 0) {
             HPmult = 10;
-            unicornType = "Epic Unicorn";
+            unicornType = 3;
         }
         if (Math.random() < 1 / luck && (unicornLVL % 25 !== 0)) {
             HPmult = 2;
-            unicornType = "Uncommon Unicorn";
+            unicornType = 1;
             if (Math.random() < 1 / luck) {
                 HPmult = 5;
-                unicornType = "Rare Unicorn";
+                unicornType = 2;
                 if (Math.random() < 1 / luck) {
                     HPmult = 10;
-                    unicornType = "Epic Unicorn";
+                    unicornType = 3;
                     if (Math.random() < 1 / luck) {
                         HPmult = 20;
-                        unicornType = "Legendary Unicorn";
+                        unicornType = 4;
                     }
                 }
             }
         }
 		if (unicornLVL == 250) {
 			HPmult = 50;
-			unicornType = "Godly Unicorn: the master of Cheese";
+			unicornType = -1;
+            godType = 1
 		}
 		else if (unicornLVL == 500) {
 			HPmult = 100;
-			unicornType = "Godly Unicorn: D I E G O"; 
-        
+			unicornType = -1;
+            godType = 2
 		}
-		if (unicornLVL <= 100) {
-			unicornHP = HPmult * Math.round(20 * Math.pow(scaling, unicornLVL));
-		}
-		else if (unicornLVL <= 250) {
-			unicornHP = HPmult * Math.round(20 * Math.pow(scaling, unicornLVL + (unicornLVL-100)*(unicornLVL-99)/200));
-		}
-		else {
-			unicornHP = HPmult * Math.round(20 * Math.pow(scaling, unicornLVL + (unicornLVL-100)*(unicornLVL-99)/100));
-		}
+        else godType = 0
 		
 		
-        currentHP = unicornHP;
+        currentHP = unicornHP();
     }
 }
 
@@ -377,13 +370,13 @@ function updateCoinGain() {
 
 function heal() {
 	if (unicornLVL == 250) {
-		currentHP += Math.round(unicornHP*0.02);
+		currentHP += Math.round(unicornHP()*0.02);
 	}
 	else if (unicornLVL == 500) {
-		currentHP += Math.round(unicornHP*0.04);
+		currentHP += Math.round(unicornHP()*0.04);
 	}
-	if (unicornHP < currentHP) {
-		currentHP = unicornHP;
+	if (unicornHP() < currentHP) {
+		currentHP = unicornHP();
 	}
 } 
 
@@ -411,7 +404,6 @@ function prestige() {
             heroLvls[unicorn]++;
 
             unicornLVL = 1;
-            unicornHP = 20;
             currentHP = 20;
             unicornType = "Common";
             dpc = 1;
@@ -435,7 +427,6 @@ function godlyPrestige() {
 	unlock = 5;
 	
 	unicornLVL = 1;
-	unicornHP = 20;
 	currentHP = 20;
 	unicornType = "Common Unicorn";
 	HPmult = 1;
@@ -461,7 +452,7 @@ function godlyPrestige() {
 }
 
 function save() {
-    let game = [unicornLVL, unicornHP, currentHP, unicornType, dpc, dps, dpcLvl, dpsLvl, coins, rainbowHair, horns, coinGain, rainbowHairGain, hornsGain, luck, coinGainCost, rainbowHairGainCost, hornsGainCost, lootBoxCost, heroLvls, unlock, lootBoxes];
+    let game = [unicornLVL, currentHP, unicornType, dpc, dps, dpcLvl, dpsLvl, coins, rainbowHair, horns, coinGain, rainbowHairGain, hornsGain, luck, coinGainCost, rainbowHairGainCost, hornsGainCost, lootBoxCost, heroLvls, unlock, lootBoxes];
     localStorage.unicorn = btoa(JSON.stringify(game));
 }
 
@@ -469,7 +460,6 @@ function load() {
     if (!localStorage.unicorn) return;
     let game = JSON.parse(atob(localStorage.unicorn));
     unicornLVL = game[0];
-    unicornHP = game[1];
     currentHP = game[2];
     unicornType = game[3];
     dpc = game[4];
