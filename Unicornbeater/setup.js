@@ -1,6 +1,6 @@
 "use strict"
 
-import { createApp } from "./Vue"
+import "./Vue" 
 
 const vue = createApp({
 data(){
@@ -16,3 +16,4 @@ luckEffect,
 })
 
 vue.mount("#vue")
+

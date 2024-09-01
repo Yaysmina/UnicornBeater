@@ -37,11 +37,13 @@ let coinGainCost = 2;
 let rainbowHairGainCost = 4;
 let hornsGainCost = 8;
 
-lootBoxCost = 5;
-lootBoxes = 0;
-unlock = 0;
-heroLvls = [0, 0, 0, 0, 0];
+let lootBoxCost = 5;
+let lootBoxes = 0;
+let unlock = 0;
+let heroLvls = [0, 0, 0, 0, 0];
 let heroNames = ["Hero of Wealth", "Hero of Strength", "Hero of Sales", "Hero of Weakness", "Hero of Luck"];
+let increaseDPCcost = Math.round(Math.pow((dpcLvl + 1), salesEffect(heroLvls[2])));
+let increaseDPScost = Math.round(Math.pow((dpsLvl + 1), salesEffect(heroLvls[2])));
 
 let health = document.getElementById("Health");
 
@@ -156,8 +158,8 @@ function dealDamage(x) {
             horns += hornsGain * 6;
         }
         unicornLVL++;
-        scaling = weaknessEffect(heroLvls[3]);
-        HPmult = 1;
+        let scaling = weaknessEffect(heroLvls[3]);
+        let HPmult = 1;
         unicornType = "Common Unicorn";
         luck = luckEffect(heroLvls[4]);
         if (unicornLVL % 25 == 0) {
@@ -229,17 +231,17 @@ function strengthEffect(x) {
 }
 
 function salesEffect(x) {
-    n = 1 + 1 / (1 + Math.pow(x, 2/3)*1.5 / 5);
+    let n = 1 + 1 / (1 + Math.pow(x, 2/3)*1.5 / 5);
     return Math.round(1000 * n) / 1000;
 }
 
 function weaknessEffect(x) {
-    n = Math.pow(1.07, (1 / (1 + Math.pow(x, 2/3)*2 / 10)));
+    let n = Math.pow(1.07, (1 / (1 + Math.pow(x, 2/3)*2 / 10)));
     return Math.round(10000 * n) / 10000;
 }
 
 function luckEffect(x) {
-    n = 4.5 / (1 + Math.pow(Math.pow(x, 2/3)*2, 0.8) / 10);
+    let n = 4.5 / (1 + Math.pow(Math.pow(x, 2/3)*2, 0.8) / 10);
     return Math.round(100 * n) / 100;
 }
 
@@ -448,13 +450,13 @@ function godlyPrestige() {
 }
 
 function save() {
-    game = [unicornLVL, unicornHP, currentHP, unicornType, dpc, dps, dpcLvl, dpsLvl, coins, rainbowHair, horns, coinGain, rainbowHairGain, hornsGain, luck, coinGainCost, rainbowHairGainCost, hornsGainCost, lootBoxCost, heroLvls, unlock, lootBoxes];
+    let game = [unicornLVL, unicornHP, currentHP, unicornType, dpc, dps, dpcLvl, dpsLvl, coins, rainbowHair, horns, coinGain, rainbowHairGain, hornsGain, luck, coinGainCost, rainbowHairGainCost, hornsGainCost, lootBoxCost, heroLvls, unlock, lootBoxes];
     localStorage.unicorn = btoa(JSON.stringify(game));
 }
 
 function load() {
     if (!localStorage.unicorn) return;
-    game = JSON.parse(atob(localStorage.unicorn));
+    let game = JSON.parse(atob(localStorage.unicorn));
     unicornLVL = game[0];
     unicornHP = game[1];
     currentHP = game[2];
@@ -478,13 +480,13 @@ function load() {
     unlock = game[20];
     lootBoxes = game[21];
 
-    increaseDPCcost = Math.round(Math.pow((dpcLvl + 1), salesEffect(heroLvls[2])));
-    increaseDPScost = Math.round(Math.pow((dpsLvl + 1), salesEffect(heroLvls[2])));
+    let increaseDPCcost = Math.round(Math.pow((dpcLvl + 1), salesEffect(heroLvls[2])));
+    let increaseDPScost = Math.round(Math.pow((dpsLvl + 1), salesEffect(heroLvls[2])));
 }
 
 function hardReset() {
     if (prompt("Type RESET if you want to reset all progress") == "RESET") {
-        game = [1, 20, 20, "Common", 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 4.5, 2, 4, 8, 5, [0, 0, 0, 0, 0], 0, 0];
+        let game = [1, 20, 20, "Common", 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 4.5, 2, 4, 8, 5, [0, 0, 0, 0, 0], 0, 0];
         localStorage.unicorn = btoa(JSON.stringify(game));
         load();
     }
@@ -493,7 +495,7 @@ function hardReset() {
 
 function displayN(n) {
     n = Math.round(n);
-    c = n.toLocaleString("en-US");
+    let c = n.toLocaleString("en-US");
     return c;
 }
 
