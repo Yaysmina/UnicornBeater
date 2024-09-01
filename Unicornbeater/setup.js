@@ -1,16 +1,13 @@
 "use strict"
 
-const vue = Vue.createApp({
-data(){
-return {
+const vue = new Vue({
+el:"#vue",
+data:{
 player,
 game,
-type: Vue.ref(type),
+type,
 unicornHP,
 dealDamage,
 }
-}
 })
-
-vue.mount("#vue")
 
