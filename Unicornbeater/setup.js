@@ -5,12 +5,9 @@ data(){
 return {
 player,
 game,
-type,
-wealthEffect,
-strengthEffect,
-salesEffect,
-weaknessEffect,
-luckEffect,
+type: Vue.ref(type),
+unicornHP,
+dealDamage,
 }
 }
 })

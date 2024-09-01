@@ -7,10 +7,12 @@ horns:0,
 Damage:{click:0,second:0},
 heroes:[0,0,0,0,0],
 HairUpgrades:[0,0,0],
+upgrades:{click:0,dps:0}
 }
 
 const game = {
 levels: 0,
+damageDealt: 0,
 }
 
 const factorials = [1, 1, 2, 6, 24, 120, 720, 5040]
@@ -18,7 +20,6 @@ const healthMults = [1, 2, 5, 10, 20, 40, 80]
 const godHealthMults = [50,100]
 
 let unicornLVL = 1;
-let currentHP = 20;
 let unicornType = 0;
 let godType = 0
 let HPmult = 1;
@@ -86,8 +87,7 @@ function update() {
 	dpc = Math.round((dpcLvl+1) * (1 + strengthEffect(player.heroes[1]) / 100));
 
     document.querySelector("#UnicornHP").innerHTML = displayN(unicornHP());
-    document.querySelector("#CurrentHP").innerHTML = displayN(currentHP);
-    document.querySelector("#DPC").innerHTML = displayN(dpc);
+    document.querySelector("#CurrentHP").innerHTML = displayN(unicornHP()-game.damageDealt);
     document.querySelector("#DPS").innerHTML = displayN(Math.round(dps * (1 + strengthEffect(player.heroes[1]) / 100)));
     document.querySelector("#Strength").innerHTML = "";
     if (player.heroes[1] > 0) {
@@ -156,19 +156,21 @@ function update() {
 }
 
 
-function dealDamage(x) {
-    currentHP -= x;
-    if (currentHP <= 0) {
+function dealDamage(type) {
+    let damage = type?player.upgrades.dps*(player.upgrades.dps+1)/2:player.upgrades.click+1
+    damage = Math.floor((1 + strengthEffect(player.heroes[1]) / 100)*damage)
+    game.damageDealt += damage;
+    if (game.damageDealt >= unicornHP()) {
 		if (unicornType == -1) {
 			godlyPrestige();
 			return;
 		}
-        player.coins+=factorial[unicornType]*coinGain
-        coins+=factorial[unicornType]*coinGain
-        player.rainbowHair+=unicornType>=1?factorial[unicornType-1]:0
-        rainbowHair+=unicornType>=1?factorial[unicornType-1]:0
-        player.horns+=unicornType>=2?factorial[unicornType-2]:0
-        horns+=unicornType>=2?factorial[unicornType-2]:0
+        player.coins+=factorials[unicornType]*coinGain
+        coins+=factorials[unicornType]*coinGain
+        player.rainbowHair+=(unicornType>=1?factorials[unicornType-1]:0)*rainbowHairGain
+        rainbowHair+=(unicornType>=1?factorials[unicornType-1]:0)*rainbowHairGain
+        player.horns+=(unicornType>=2?factorials[unicornType-2]:0)*hornsGain
+        horns+=(unicornType>=2?factorials[unicornType-2]:0)*hornsGain
         game.levels++
         let HPmult = 1;
         unicornType = 0;
@@ -210,7 +212,7 @@ function dealDamage(x) {
         else godType = 0
 		
 		
-        currentHP = unicornHP();
+        game.damageDealt = 0;
     }
 }
 
@@ -370,13 +372,13 @@ function updateCoinGain() {
 
 function heal() {
 	if (game.levels == 250) {
-		currentHP += Math.round(unicornHP()*0.02);
+		game.damageDealt -= Math.round(unicornHP()*0.02);
 	}
 	else if (game.levels == 500) {
-		currentHP += Math.round(unicornHP()*0.04);
+		game.damageDealt -= Math.round(unicornHP()*0.04);
 	}
-	if (unicornHP() < currentHP) {
-		currentHP = unicornHP();
+	if (game.damageDealt < 0) {
+		game.damageDealt = 0;
 	}
 } 
 
@@ -404,7 +406,7 @@ function prestige() {
             player.heroes[unicorn]++;
 
             game.levels = 0;
-            currentHP = 20;
+            game.damageDealt = 0;
             unicornType = "Common";
             dpc = 1;
             dps = 0;
@@ -427,7 +429,7 @@ function godlyPrestige() {
 	unlock = 5;
 	
 	game.levels = 0;
-	currentHP = 20;
+	game.damageDealt = 0;
 	unicornType = "Common Unicorn";
 	HPmult = 1;
 	dpc = 1;
@@ -485,6 +487,6 @@ function displayN(n) {
 load();
 setInterval( () => save(), 33);
 setInterval( () => update(), 33);
-setInterval( () => dealDamage(Math.round(dps * (1 + strengthEffect(player.heroes[1]) / 100))), 1000);
+setInterval( () => dealDamage(1), 1000);
 setInterval( () => heal(), 1000);
 setInterval( () => buyAuto(), 100);
