@@ -10,7 +10,7 @@ HairUpgrades:[0,0,0],
 }
 
 const game = {
-Level: 0,
+Levels: 0,
 
 }
 
