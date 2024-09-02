@@ -37,10 +37,11 @@ let game = copyObject(OG)
 
 const factorials = [1, 1, 2, 6, 24, 120, 720, 5040]
 const healthMults = [1, 2, 5, 10, 20, 40, 80]
-const godHealthMults = [50,100]
+const godHealthMults = [100,200]
 
 let unicornLVL = 1;
 let unicornType = 0;
+let unicornCounters = [0, 1, 1, 1, 1, 1, 1]
 let godType = 0
 let HPmult = 1;
 let dpc = 1;
@@ -55,11 +56,12 @@ let horns = 0;
 let coinGain = 1;
 let rainbowHairGain = 1;
 let hornsGain = 1;
-let luck = 4.5;
+let luck = 5;
 
 let lootBoxCost = 5;
 let lootBoxes = 0;
 let heroNames = ["Hero of Wealth", "Hero of Strength", "Hero of Sales", "Hero of Weakness", "Hero of Luck"];
+let heroGolden = [false, false, false, false, false]
 let increaseDPCcost = Math.round(Math.pow((dpcLvl + 1), salesEffect(player.heroes[2])));
 let increaseDPScost = Math.round(Math.pow((dpsLvl + 1), salesEffect(player.heroes[2])));
 
@@ -104,6 +106,31 @@ function update() {
  
 }
 
+function calculateChance(type) {
+	let bonus = Math.max(1, unicornCounters[type] * Math.power(1 / luck, type));
+	return bonus * Math.power(1 / luck, type);
+}
+
+function determineUnicornType() {
+	let highest = 0;
+	if (Math.random() < calculateChance(1)) {highest = 1};
+	if (Math.random() < calculateChance(2)) {highest = 2};
+	if (Math.random() < calculateChance(3)) {highest = 3};
+	if (Math.random() < calculateChance(4)) {highest = 4};
+	if (heroGolden[4]) {
+		if (Math.random() < calculateChance(5)) {highest = 5};
+		if (Math.random() < calculateChance(6)) {highest = 6};
+	}
+	// this should be in a for loop
+	unicornsCounters[1]++;
+	unicornsCounters[2]++;
+	unicornsCounters[3]++;
+	unicornsCounters[4]++;
+	unicornsCounters[5]++;
+	unicornsCounters[6]++;
+	unicornsCounters[highest] = 1;
+	return highest
+}
 
 function dealDamage(type) {
     let damage = type?player.upgrades.dps*(player.upgrades.dps+1)/2:player.upgrades.click+1
@@ -121,33 +148,10 @@ function dealDamage(type) {
         player.rainbowHair+=(unicornType>=1?factorials[unicornType-1]:0)*rainbowHairGain
         player.horns+=(unicornType>=2?factorials[unicornType-2]:0)*hornsGain
         game.levels++
-        let HPmult = 1;
-        unicornType = 0;
         luck = luckEffect(player.heroes[4]);
-        if (game.levels % 25 == 0) {
-            HPmult = 5;
-            unicornType = 2;
-        }
-        if (game.levels % 100 == 0) {
-            HPmult = 10;
-            unicornType = 3;
-        }
-        if (Math.random() < 1 / luck && (game.levels % 25 !== 0)) {
-            HPmult = 2;
-            unicornType = 1;
-            if (Math.random() < 1 / luck) {
-                HPmult = 5;
-                unicornType = 2;
-                if (Math.random() < 1 / luck) {
-                    HPmult = 10;
-                    unicornType = 3;
-                    if (Math.random() < 1 / luck) {
-                        HPmult = 20;
-                        unicornType = 4;
-                    }
-                }
-            }
-        }
+	unicornType = determineUnicornType();
+	unicornHP();
+
 		if (game.levels == 250) {
 			HPmult = 50;
 			unicornType = -1;
