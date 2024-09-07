@@ -53,20 +53,18 @@ Rainbow Hair</button> Mult: x {{ 2**player.hairUpgrades[2] }} <br>
 </div>
 
 <div v-if="player.unlocks.horns" id="lootbox">
-<button id="LootBox" onclick="buyLootBox()"> Buy a lootbox for <span id="LootBoxCost"></span> Horns</button>
-<button id="Prestige" onclick="prestige()"> <span id="PrestigeText"></span> </button> <br>
+<button id="LootBox" onclick="buyLootBox()"> Buy a lootbox for {{ 5+game.boughtLootboxes }} Horns</button>
+<button id="Prestige" onclick="prestige()"> {{ player.lootBoxes>0?`Reset your progress to open ${player.lootBoxes} lootbox${pluralize(player.lootBoxes,"es")}`:"Buy at least one lootbox to prestige..." }} </button> <br>
 <br>
 <br>
 </div>
 
 <div v-if="player.unlocks.heroes" id="heroes">
-Wealth (lvl <span id="WealthLvl"></span>): You gain <span id="WealthEffect"></span>% more coins <br><br>
-Strength (lvl <span id="StrengthLvl"></span>): You do <span id="StrengthEffect"></span>% more dps and dpc<br><br>
-Sales (lvl <span id="SalesLvl"></span>): Coin costs are raised to ^<span id="SalesEffect"></span><br><br>
-Weakness (lvl <span id="WeaknessLvl"></span>): Unicorns are <span id="WeaknessEffect"></span>x stronger each lvl
-<br><br>
-Luck (lvl <span id="LuckLvl"></span>): You have a 1 in <span id="LuckEffect"></span> chance to get rarer
-Unicorns <br><br>
+Wealth (lvl {{ player.heroes[0] }}): You gain {{ wealthEffect() }} % more coins <br><br>
+Strength (lvl {{ player.heroes[1] }}): You do {{ strengthEffect() }}% more dps and dpc<br><br>
+Sales (lvl {{ player.heroes[2] }}): Coin costs are raised to ^{{ salesEffect() }} <br><br>
+Weakness (lvl {{ player.heroes[3] }}): Unicorns are {{ weaknessEffect() }}x stronger each lvl<br><br>
+Luck (lvl {{ player.heroes[4] }}): You have a {{ (luckEffect()/0.2).toFixed(2) }} chance to get rarer Unicorns ( 0.2 -> {{ luckEffect() }} ) <br><br>
 <br>
 <br>
 </div>

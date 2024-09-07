@@ -13,13 +13,17 @@ unlocks:{
     horns: false,
     heroes: false,
 },
-maxBuy: false
+maxBuy: false,
+lootBoxes:0,
 }
 
 const OG = {
 levels: 0,
 damageDealt: 0,
 rainbowHairGainCost:4,
+boughtLootboxes: 0,
+unicornCounter: [0.8,0.16,0.032,0.0064,0.00128,0.000256,0.000064],
+unicornType:0
 }
 
 let copyObject = function(x){
@@ -34,14 +38,36 @@ return object
 let player = copyObject(OP)
 let game = copyObject(OG)
 
+let pluralize = function(x,y="s",z=""){
+if(x===1) return z
+return y
+}
+
 
 const factorials = [1, 1, 2, 6, 24, 120, 720, 5040]
 const healthMults = [1, 2, 5, 10, 20, 40, 80]
 const godHealthMults = [100,200]
 
+function weightedRandom(...chances){
+let total = 0
+if(chances.includes(Infinity)){
+let infArray = []
+for(let i=0;i<chances.length;i++){
+if(!isFinite(chances[i])) infArray.push(i)
+}
+return infArray[Math.floor(Math.random()*infArray.length)]
+}
+for(let chance of chances){
+total += chance
+}
+let value = Math.random()*total
+for(let i=0;i<chances.length;i++){
+if(chances[i]>value) return i
+else value-=chances[i]
+}
+}
+
 let unicornLVL = 1;
-let unicornType = 0;
-let unicornCounters = [0, 1, 1, 1, 1, 1, 1]
 let godType = 0
 let HPmult = 1;
 let dpc = 1;
@@ -51,19 +77,13 @@ let dpsLvl = 0;
 let autoBuy = false;
 let autoBuyType = "Smart"
 
-let coins = 0;
 let horns = 0;
-let coinGain = 1;
-let rainbowHairGain = 1;
 let hornsGain = 1;
-let luck = 5;
 
 let lootBoxCost = 5;
 let lootBoxes = 0;
 let heroNames = ["Hero of Wealth", "Hero of Strength", "Hero of Sales", "Hero of Weakness", "Hero of Luck"];
 let heroGolden = [false, false, false, false, false]
-let increaseDPCcost = Math.round(Math.pow((dpcLvl + 1), salesEffect(player.heroes[2])));
-let increaseDPScost = Math.round(Math.pow((dpsLvl + 1), salesEffect(player.heroes[2])));
 
 let health = document.getElementById("Health");
 
@@ -77,20 +97,20 @@ return num
 }
 
 let type = function(){
-    return ["Common","Uncommon","Rare","Epic","Legendary","Mythic","Exotic"][unicornType]
+    return ["Common","Uncommon","Rare","Epic","Legendary","Mythic","Exotic"][game.unicornType]
 }
 
 let unicornHP = function(){
     let scaling = weaknessEffect(player.heroes[3]);
     if(godType==0){
         if (game.levels <= 100) {
-            return healthMults[unicornType] * Math.round(20 * Math.pow(scaling, game.levels));
+            return healthMults[game.unicornType] * Math.round(20 * Math.pow(scaling, game.levels));
         }
         else if (game.levels <= 250) {
-            return healthMults[unicornType] * Math.round(20 * Math.pow(scaling, game.levels + (game.levels-100)*(game.levels-99)/200));
+            return healthMults[game.unicornType] * Math.round(20 * Math.pow(scaling, game.levels + (game.levels-100)*(game.levels-99)/200));
         }
         else {
-            return healthMults[unicornType] * Math.round(20 * Math.pow(scaling, game.levels + (game.levels-100)*(game.levels-99)/100));
+            return healthMults[game.unicornType] * Math.round(20 * Math.pow(scaling, game.levels + (game.levels-100)*(game.levels-99)/100));
         }
     }
     else return godHealthMults[godType] * Math.round(20 * Math.pow(scaling, unicornLVL + (unicornLVL-100)*(unicornLVL-99)/100));
@@ -98,38 +118,28 @@ let unicornHP = function(){
 
 function update() {
 
-    updateCoinGain();
 	dpc = Math.round((dpcLvl+1) * (1 + strengthEffect(player.heroes[1]) / 100));
-    if (player.heroes[1] > 0) {
-        document.querySelector("#Strength").innerHTML = "(" + displayN(dps) + " + " + displayN(Math.round(dps * strengthEffect(player.heroes[1]) / 100)) + ")";
-    }
  
 }
 
-function calculateChance(type) {
-	let bonus = Math.max(1, unicornCounters[type] * Math.power(1 / luck, type));
-	return bonus * Math.power(1 / luck, type);
-}
-
 function determineUnicornType() {
-	let highest = 0;
-	if (Math.random() < calculateChance(1)) {highest = 1};
-	if (Math.random() < calculateChance(2)) {highest = 2};
-	if (Math.random() < calculateChance(3)) {highest = 3};
-	if (Math.random() < calculateChance(4)) {highest = 4};
-	if (heroGolden[4]) {
-		if (Math.random() < calculateChance(5)) {highest = 5};
-		if (Math.random() < calculateChance(6)) {highest = 6};
-	}
-	// this should be in a for loop
-	unicornsCounters[1]++;
-	unicornsCounters[2]++;
-	unicornsCounters[3]++;
-	unicornsCounters[4]++;
-	unicornsCounters[5]++;
-	unicornsCounters[6]++;
-	unicornsCounters[highest] = 1;
-	return highest
+    let trueChances = []
+    for(let i=0;i<=6;i++){
+    let normalChance = luckEffect()**i*(i==6?1:1-luckEffect())
+    let expectedAmt = game.levels*normalChance
+    let amtProportion = game.unicornCounter[i]/expectedAmt
+    if(amtProportion>1) trueChances[i]=normalChance*(1/(Math.cbrt(amtProportion)))
+    if(amtProportion<1) trueChances[i]=normalChance*(Math.log(amtProportion+Math.E)/Math.cbrt(amtProportion))
+    if(amtProportion===1) trueChances[i]=normalChance
+    if(game.levels%5==4&&i>0) trueChances[i]*=2
+    if(game.levels%10==9&&i>1) trueChances[i]*=2
+    if(game.levels%25==24&&i>2) trueChances[i]*=2
+    console.log(normalChance,expectedAmt,amtProportion,trueChances[i])
+    }
+
+    let uType = weightedRandom(...trueChances)
+    game.unicornCounter[uType]++
+	return uType
 }
 
 function dealDamage(type) {
@@ -137,29 +147,29 @@ function dealDamage(type) {
     damage = Math.floor((1 + strengthEffect(player.heroes[1]) / 100)*damage)
     game.damageDealt += damage;
     if (game.damageDealt >= unicornHP()) {
-        if ( unicornType>=0 ) player.unlocks.coins = true
-        if ( unicornType>=1 ) player.unlocks.rainbowHair = true
-        if ( unicornType>=2 ) player.unlocks.horns = true
-		if (unicornType == -1) {
+        if ( game.unicornType>=0 ) player.unlocks.coins = true
+        if ( game.unicornType>=1 ) player.unlocks.rainbowHair = true
+        if ( game.unicornType>=2 ) player.unlocks.horns = true
+		if (game.unicornType == -1) {
 			godlyPrestige();
 			return;
 		}
-        player.coins+=factorials[unicornType]*coinGain
-        player.rainbowHair+=(unicornType>=1?factorials[unicornType-1]:0)*rainbowHairGain
-        player.horns+=(unicornType>=2?factorials[unicornType-2]:0)*hornsGain
+        player.coins+=factorials[game.unicornType]*coinGain()
+        player.rainbowHair+=(game.unicornType>=1?factorials[game.unicornType-1]:0)*rainbowHairGain()
+        player.horns+=(game.unicornType>=2?factorials[game.unicornType-2]:0)*hornsGain
         game.levels++
-        luck = luckEffect(player.heroes[4]);
-	unicornType = determineUnicornType();
-	unicornHP();
+        game.unicornCounter[game.unicornType]++
+	    game.unicornType = determineUnicornType();
+	    unicornHP();
 
 		if (game.levels == 250) {
 			HPmult = 50;
-			unicornType = -1;
+			game.unicornType = -1;
             godType = 1
 		}
 		else if (game.levels == 500) {
 			HPmult = 100;
-			unicornType = -1;
+			game.unicornType = -1;
             godType = 2
 		}
         else godType = 0
@@ -169,7 +179,7 @@ function dealDamage(type) {
     }
 }
 
-function wealthEffect(x) {
+function wealthEffect(x = player.heroes[0]) {
     if (!x) {
         return 0;
 	} else if (x <= 5) {
@@ -179,7 +189,7 @@ function wealthEffect(x) {
 	}
 }
 
-function strengthEffect(x) {
+function strengthEffect(x = player.heroes[1]) {
     if (!x) {
         return 0;
 	} else if (x <= 5) {
@@ -189,18 +199,18 @@ function strengthEffect(x) {
 	}
 }
 
-function salesEffect(x) {
+function salesEffect(x = player.heroes[2]) {
     let n = 1 + 1 / (1 + Math.pow(x, 2/3)*1.5 / 5);
     return Math.round(1000 * n) / 1000;
 }
 
-function weaknessEffect(x) {
+function weaknessEffect(x = player.heroes[3]) {
     let n = Math.pow(1.07, (1 / (1 + Math.pow(x, 2/3)*2 / 10)));
     return Math.round(10000 * n) / 10000;
 }
 
-function luckEffect(x) {
-    let n = 4.5 / (1 + Math.pow(Math.pow(x, 2/3)*2, 0.8) / 10);
+function luckEffect(x = player.heroes[4]) {
+    let n = 0.2+Math.pow(x*Math.sqrt(1+Math.log(1+x)),1/(3+Math.log(1+Math.log(1+x))))/10
     return Math.round(100 * n) / 100;
 }
 
@@ -237,16 +247,13 @@ function toggleMaxBuy() {
 function buyAuto() {
 	if (autoBuy) {
 		if (autoBuyType == "Rainbow Hair") {
-			doubleplayer.rainbowHairGain();
 		}
 		else if (autoBuyType == "Horns") {
 			doubleHornsGain();
 		}
 		else if (autoBuyType == "Smart") { 
 			doubleHornsGain();
-			doubleplayer.rainbowHairGain();
 			if (player.rainbowHair >= 5 * coinGainCost) {
-				doubleCoinGain();
 			}
 		}		
 	}
@@ -276,7 +283,6 @@ if(type==1){
         game.rainbowHairGainCost *= 3;
 		if (game.rainbowHairGainCost > 100) {game.rainbowHairGainCost *= 1 + Math.floor(Math.log10(game.rainbowHairGainCost))/10};
 		game.rainbowHairGainCost = Math.round(game.rainbowHairGainCost);
-        player.rainbowHairGain *= 2;
         player.hairUpgrades[1]++
     }    
 }
@@ -289,16 +295,22 @@ if(type==2){
 }
 
 function buyLootBox() {
-    if (horns >= lootBoxCost) {
-        horns -= lootBoxCost;
-        lootBoxes++;
-        lootBoxCost++;
+    if (player.horns >= 5+game.boughtLootboxes) {
+        player.horns -= 5+game.boughtLootboxes;
+        player.lootBoxes++;
+        game.boughtLootboxes++;
     }
 }
 
-function updateCoinGain() {
-    coinGain = 2**player.hairUpgrades[0];
-    coinGain = Math.round(coinGain * (1 + wealthEffect(player.heroes[0]) / 100));
+function coinGain() {
+    let gain = 2**player.hairUpgrades[0];
+    gain *= (1 + wealthEffect(player.heroes[0]) / 100);
+    return Math.round(gain)
+}
+
+function rainbowHairGain(){
+    let gain = 2**player.hairUpgrades[1]
+    return gain
 }
 
 function heal() {
@@ -314,42 +326,33 @@ function heal() {
 } 
 
 function prestige() {
-    if (lootBoxes > 0) {
+    if (player.lootBoxes > 0) {
         player.unlocks.heroes = true
-        while (lootBoxes > 0) {
-            lootBoxes--;
-            let rng = Math.random();
-            unicorn = 0;
-            if (rng < 0.20) {
-                unicorn = 0;
-            } else if (rng < 0.40) {
-                unicorn = 1;
-            } else if (rng < 0.60) {
-                unicorn = 2;
-            } else if (rng < 0.80) {
-                unicorn = 3;
-            } else if (rng < 1.00) {
-                unicorn = 4;
+        while (player.lootBoxes > 0) {
+            player.lootBoxes--;
+            let amt = 0
+            for(let hero of player.heroes){
+            amt += hero
             }
-			if (lootBoxCost < 20) {
+            let chances = []
+            for(let i=0;i<5;i++){
+            chances[i] = 1/Math.sqrt(5*(player.heroes[i]+1)/(amt+5))
+            }
+            let unicorn = weightedRandom(...chances)
+			if (game.lootBoxCost < 20) {
 				alert("You found a " + heroNames[unicorn] + "!");
 			} 
             player.heroes[unicorn]++;
-
+            game.unicornCounter = Array(7).fill(0)
+            for(let i=0;i<7;i++){
+                game.unicornCounter[i] = (luckEffect())**i*(i==6?1:1-luckEffect())
+            }
             game.levels = 0;
             game.damageDealt = 0;
-            unicornType = "Common";
-            dpc = 1;
-            dps = 0;
-            dpcLvl = 0;
-            dpsLvl = 0;
-            coins = 0;
+            game.unicornType = 0;
+            player.upgrades = {click:0,dps:0}
             player.rainbowHair = 0;
-            player.rainbowHairGain = 1;
-            hornsGain = 1;
             game.rainbowHairGainCost = 4;
-            increaseDPCcost = Math.round(Math.pow((dpcLvl + 1), salesEffect(player.heroes[2])));
-            increaseDPScost = Math.round(Math.pow((dpsLvl + 1), salesEffect(player.heroes[2])));
         }
     }
 }
@@ -358,20 +361,16 @@ function godlyPrestige() {
 	
 	game.levels = 0;
 	game.damageDealt = 0;
-	unicornType = "Common Unicorn";
+	game.unicornType = "Common Unicorn";
 	HPmult = 1;
 	dpc = 1;
 	dps = 0;
 	dpcLvl = 0;
 	dpsLvl = 0;
 	player.maxBuy = false;
-	coins = 0;
 	player.rainbowHair = 0;
 	horns = 0;
-	coinGain = 1;
-	player.rainbowHairGain = 1;
 	hornsGain = 1;
-	luck = 4.5;
 	game.rainbowHairGainCost = 4;
 	lootBoxCost = 5;
 	lootBoxes = 0;
