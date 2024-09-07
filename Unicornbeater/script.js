@@ -4,7 +4,7 @@ const OP = {
 coins: 0,
 rainbowHair:0,
 horns:0,
-heroes:[0,0,0,0,0],
+heroes:{0:0,1:0,2:0,3:0,4:0},
 hairUpgrades:[0,0,0],
 upgrades:{click:0,dps:0},
 unlocks:{
@@ -45,7 +45,6 @@ let autoBuy = false;
 let autoBuyType = "Smart"
 
 let horns = 0;
-let hornsGain = 1;
 
 let lootBoxCost = 5;
 let lootBoxes = 0;
@@ -108,7 +107,7 @@ function dealDamage(type) {
 		}
         player.coins+=factorials[game.unicornType]*coinGain()
         player.rainbowHair+=(game.unicornType>=1?factorials[game.unicornType-1]:0)*rainbowHairGain()
-        player.horns+=(game.unicornType>=2?factorials[game.unicornType-2]:0)*hornsGain
+        player.horns+=(game.unicornType>=2?factorials[game.unicornType-2]:0)*hornsGain()
         game.levels++
         game.unicornCounter[game.unicornType]++
 	    game.unicornType = determineUnicornType();
@@ -265,6 +264,11 @@ function rainbowHairGain(){
     return gain
 }
 
+function hornsGain(){
+    let gain = 2**player.hairUpgrades[2]
+    return gain
+}
+
 function heal() {
 	if (game.levels == 250) {
 		game.damageDealt -= Math.round(unicornHP()*0.02);
@@ -304,6 +308,9 @@ function prestige() {
             game.unicornType = 0;
             player.upgrades = {click:0,dps:0}
             player.rainbowHair = 0;
+            player.coins = 0
+            player.horns = 0
+            player.hairUpgrades = [0,0,0]
             game.rainbowHairGainCost = 4;
         }
     }
@@ -322,7 +329,6 @@ function godlyPrestige() {
 	player.maxBuy = false;
 	player.rainbowHair = 0;
 	horns = 0;
-	hornsGain = 1;
 	game.rainbowHairGainCost = 4;
 	lootBoxCost = 5;
 	lootBoxes = 0;

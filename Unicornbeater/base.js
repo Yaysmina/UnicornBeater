@@ -1,3 +1,5 @@
+"use strict"
+
 let copyObject = function(x){
 if(typeof x!=="object") return x
 let object = new x.constructor()
@@ -61,6 +63,6 @@ function image(){
 return "images/"+type().toLowerCase()+".png"
 }
 
-const factorials = [1, 1, 2, 6, 24, 120, 720, 5040]
+const factorials = [1, 2, 6, 24, 120, 720, 5040]
 const healthMults = [1, 2, 5, 10, 20, 40, 80]
 const godHealthMults = [100,200]

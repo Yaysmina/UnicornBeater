@@ -32,8 +32,8 @@ Horns: {{ player.horns }}
 
 <div v-if="player.unlocks.coins" id="damage">
 <button id="MaxBuy" onclick="toggleMaxBuy()"> Toggle max buy: {{ player.maxBuy }} </button> <br>
-<button id="IncreaseDPC" onclick="buyCoinUpgrade(0)"> Spank 1 HP more per click for {{ player.upgrades.dps+1 }} for {{ Math.round(Math.pow((player.upgrades.click + 1), salesEffect(player.heroes[2]))) }} Coins</button> <br>
-<button id="IncreaseDPS" onclick="buyCoinUpgrade(1)"> Increase base DPS by {{ Math.round(Math.pow((player.upgrades.dps + 1), salesEffect(player.heroes[2]))) }}  Coins</button> <br>
+<button id="IncreaseDPC" onclick="buyCoinUpgrade(0)"> Spank 1 HP more per click for {{ Math.round(Math.pow((player.upgrades.click + 1), salesEffect(player.heroes[2]))) }} Coins</button> <br>
+<button id="IncreaseDPS" onclick="buyCoinUpgrade(1)"> Increase base DPS by {{ player.upgrades.dps+1 }} for {{ Math.round(Math.pow((player.upgrades.dps + 1), salesEffect(player.heroes[2]))) }}  Coins</button> <br>
 <br>
 <br>
 </div>
