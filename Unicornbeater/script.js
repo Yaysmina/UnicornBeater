@@ -26,46 +26,13 @@ unicornCounter: [0.8,0.16,0.032,0.0064,0.00128,0.000256,0.000064],
 unicornType:0
 }
 
-let copyObject = function(x){
-if(typeof x!=="object") return x
-let object = new x.constructor()
-for(let i in x){
-    object[i] = copyObject(x[i])
-}
-return object
-}
-
 let player = copyObject(OP)
 let game = copyObject(OG)
 
-let pluralize = function(x,y="s",z=""){
-if(x===1) return z
-return y
-}
 
 
-const factorials = [1, 1, 2, 6, 24, 120, 720, 5040]
-const healthMults = [1, 2, 5, 10, 20, 40, 80]
-const godHealthMults = [100,200]
 
-function weightedRandom(...chances){
-let total = 0
-if(chances.includes(Infinity)){
-let infArray = []
-for(let i=0;i<chances.length;i++){
-if(!isFinite(chances[i])) infArray.push(i)
-}
-return infArray[Math.floor(Math.random()*infArray.length)]
-}
-for(let chance of chances){
-total += chance
-}
-let value = Math.random()*total
-for(let i=0;i<chances.length;i++){
-if(chances[i]>value) return i
-else value-=chances[i]
-}
-}
+
 
 let unicornLVL = 1;
 let godType = 0
@@ -85,20 +52,6 @@ let lootBoxes = 0;
 let heroNames = ["Hero of Wealth", "Hero of Strength", "Hero of Sales", "Hero of Weakness", "Hero of Luck"];
 let heroGolden = [false, false, false, false, false]
 
-let health = document.getElementById("Health");
-
-let factorial = function(x){
-let num = 1
-while(x){
-    num*=x
-    x--    
-}
-return num
-}
-
-let type = function(){
-    return ["Common","Uncommon","Rare","Epic","Legendary","Mythic","Exotic"][game.unicornType]
-}
 
 let unicornHP = function(){
     let scaling = weaknessEffect(player.heroes[3]);
@@ -134,7 +87,6 @@ function determineUnicornType() {
     if(game.levels%5==4&&i>0) trueChances[i]*=2
     if(game.levels%10==9&&i>1) trueChances[i]*=2
     if(game.levels%25==24&&i>2) trueChances[i]*=2
-    console.log(normalChance,expectedAmt,amtProportion,trueChances[i])
     }
 
     let uType = weightedRandom(...trueChances)
@@ -361,7 +313,7 @@ function godlyPrestige() {
 	
 	game.levels = 0;
 	game.damageDealt = 0;
-	game.unicornType = "Common Unicorn";
+	game.unicornType = 0;
 	HPmult = 1;
 	dpc = 1;
 	dps = 0;
@@ -375,28 +327,6 @@ function godlyPrestige() {
 	lootBoxCost = 5;
 	lootBoxes = 0;
 	player.heroes = [0, 0, 0, 0, 0];
-}
-
-function save() {
-    localStorage.unicorn = btoa(JSON.stringify({player,game}));
-}
-
-function load() {
-    if (localStorage.unicorn){
-    let info = JSON.parse(atob(localStorage.unicorn));
-    game = copyObject(info.game)
-    player = copyObject(info.player)
-    }
-}
-
-function hardReset() {
-    if (prompt("Type RESET if you want to reset all progress") == "RESET") {
-        player = copyObject(OP)
-        game = copyObject(OG)
-        localStorage.unicorn = btoa(JSON.stringify({game,player}));
-        location.reload()
-    }
-
 }
 
 function displayN(n) {
