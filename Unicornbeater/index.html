@@ -64,7 +64,7 @@ Rainbow Hair</button> Mult: x {{ 2**player.hairUpgrades[2] }} <br>
 <div v-if="player.unlocks.heroes" id="heroes">
 Wealth (lvl {{ player.heroes[0] }}): You gain {{ wealthEffect() }} % more coins <br><br>
 Strength (lvl {{ player.heroes[1] }}): You do {{ strengthEffect() }}% more dps and dpc<br><br>
-Sales (lvl {{ player.heroes[2] }}): Coin costs are raised to ^{{ salesEffect() }} <br><br>
+Sales (lvl {{ player.heroes[2] }}): Coin costs are raised to ^{{ salesEffect()/2 }} <br><br>
 Weakness (lvl {{ player.heroes[3] }}): Unicorns are {{ weaknessEffect() }}x stronger each lvl<br><br>
 Luck (lvl {{ player.heroes[4] }}): You have a {{ (luckEffect()/0.2).toFixed(2) }} chance to get rarer Unicorns ( 0.2 -> {{ luckEffect() }} ) <br><br>
 <br>

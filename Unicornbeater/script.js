@@ -287,8 +287,8 @@ function prestige() {
         while (player.lootBoxes > 0) {
             player.lootBoxes--;
             let amt = 0
-            for(let hero of player.heroes){
-            amt += hero
+            for(let hero in player.heroes){
+            amt += player.heroes[hero]
             }
             let chances = []
             for(let i=0;i<5;i++){

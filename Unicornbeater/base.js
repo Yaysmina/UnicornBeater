@@ -56,13 +56,13 @@ else value-=chances[i]
 }
 
 let type = function(){
-    return ["Common","Uncommon","Rare","Epic","Legendary","Mythic","Exotic"][game.unicornType]
+    return ["Common","Uncommon","Rare","Epic","Legendary","Mythical","Exotic"][game.unicornType]
 }
 
 function image(){
 return "images/"+type().toLowerCase()+".png"
 }
 
-const factorials = [1, 2, 6, 24, 120, 720, 5040]
+const factorials = [1, 2, 16/3, 2560/153, 204800000/3503547, 1662976000000000000/7530735651655851, 495607278571847680000000000000000000000/559310708577232744347594041330516361]
 const healthMults = [1, 2, 5, 10, 20, 40, 80]
 const godHealthMults = [100,200]
