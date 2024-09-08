@@ -179,17 +179,17 @@ if(player.coins>=cost){
 player.coins-=cost
 player.upgrades.click++
 }
-}while(player.maxBuy&&player.coins>=Math.round(Math.pow(salesEffect(player.heroes[2]), player.upgrades.click)))
+}while(player.maxBuy&&player.coins>=Math.round(Math.pow(salesEffect(player.heroes[2]), player.upgrades.click+2)/Math.sqrt(5)))
 }
 
 if(type==1)
 do{
-let cost = Math.round(Math.pow((player.upgrades.dps + 1), salesEffect(player.heroes[2])));
+let cost = Math.round(Math.pow(salesEffect(player.heroes[2]), player.upgrades.dps+2)/Math.sqrt(5));
 if(player.coins>=cost){
 player.coins-=cost
 player.upgrades.dps++
 }
-}while(player.maxBuy&&player.coins>=Math.round(Math.pow((player.upgrades.dps + 1), salesEffect(player.heroes[2]))))
+}while(player.maxBuy&&player.coins>=Math.round(Math.pow(salesEffect(player.heroes[2]), player.upgrades.dps+2)/Math.sqrt(5)))
 
 }
 
