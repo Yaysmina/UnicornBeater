@@ -153,7 +153,7 @@ function strengthEffect(x = player.heroes[1]) {
 
 function salesEffect(x = player.heroes[2]) {
     //let n = 1 + 1 / (1 + Math.pow(x, 2/3)*1.5 / 5);
-    let n = 1.61803399
+    let n = 1.61803399 //golden ratio
     return Math.round(1000 * n) / 1000;
 }
 
@@ -174,7 +174,7 @@ function getRandomhero() {
 function buyCoinUpgrade(type){
 if(type==0){
 do{
-let cost = Math.round(Math.pow(salesEffect(player.heroes[2]), player.upgrades.click+2)/Math.sqrt(5));
+let cost = Math.round(Math.pow(salesEffect(player.heroes[2]), player.upgrades.click+2)/Math.sqrt(5)); //fibonacci sequence
 if(player.coins>=cost){
 player.coins-=cost
 player.upgrades.click++
@@ -184,7 +184,7 @@ player.upgrades.click++
 
 if(type==1)
 do{
-let cost = Math.round(Math.pow(salesEffect(player.heroes[2]), player.upgrades.dps+2)/Math.sqrt(5));
+let cost = Math.round(Math.pow(salesEffect(player.heroes[2]), player.upgrades.dps+2)/Math.sqrt(5)); //fibonacci sequence
 if(player.coins>=cost){
 player.coins-=cost
 player.upgrades.dps++
