@@ -83,6 +83,7 @@ function determineUnicornType() {
     if(amtProportion>1) trueChances[i]=normalChance*(1/(Math.cbrt(amtProportion)))
     if(amtProportion<1) trueChances[i]=normalChance*(Math.log(amtProportion+Math.E)/Math.cbrt(amtProportion))
     if(amtProportion===1) trueChances[i]=normalChance
+    // doubles the chance of it being rare when the level is a multiple of each of those: 5, 10, and 25
     if(game.levels%5==4&&i>0) trueChances[i]*=2
     if(game.levels%10==9&&i>1) trueChances[i]*=2
     if(game.levels%25==24&&i>2) trueChances[i]*=2
@@ -105,9 +106,9 @@ function dealDamage(type) {
 			godlyPrestige();
 			return;
 		}
-        player.coins+=factorials[game.unicornType]*coinGain()
-        player.rainbowHair+=(game.unicornType>=1?factorials[game.unicornType-1]:0)*rainbowHairGain()
-        player.horns+=(game.unicornType>=2?factorials[game.unicornType-2]:0)*hornsGain()
+        player.coins+=Math.round(baseRewards[game.unicornType]*coinGain())
+        player.rainbowHair+=Math.round((game.unicornType>=1?baseRewards[game.unicornType-1]:0)*rainbowHairGain())
+        player.horns+=Math.round((game.unicornType>=2?baseRewards[game.unicornType-2]:0)*hornsGain())
         game.levels++
         game.unicornCounter[game.unicornType]++
 	    game.unicornType = determineUnicornType();
