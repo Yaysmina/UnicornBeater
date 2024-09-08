@@ -18,7 +18,7 @@
 <div class="unicornLvlKleur"> {{ type() }} unicorn <div class=""></div> lvl {{ game.levels+1 }} </div>
 <div class="centrr"><progress id="Health" :value="  (unicornHP()-game.damageDealt)/unicornHP()*100 " max="100"></progress></div>
 HP: {{ unicornHP()-game.damageDealt }} / {{ unicornHP() }} <br>
-DPS: {{ Math.floor((1 + strengthEffect(player.heroes[1]) / 100)*player.upgrades.dps*2 }}</span>
+DPS: {{ Math.floor((1 + strengthEffect(player.heroes[1]) / 100)*player.upgrades.dps*2) }}</span>
 <img id="assUnicorn" @click="dealDamage(0)" :src="image()"  alt="">
 <button id="DealDamage" @click="dealDamage(0)"> Spank {{ 1+player.upgrades.click }} HP away from the Unicorn</button>
 <br>
