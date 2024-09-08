@@ -34,7 +34,7 @@ Horns: {{ player.horns }}
 </div>
 <div v-if="player.unlocks.coins" id="damage">
 <button id="IncreaseDPC" onclick="buyCoinUpgrade(0)"> Increase base Click Damage by 1 for {{ Math.round(Math.pow(salesEffect(player.heroes[2]), player.upgrades.click+2)/Math.sqrt(5)) }} Coins</button> <br>
-<button id="IncreaseDPS" onclick="buyCoinUpgrade(1)"> Increase base Auto Damage by 2 for {{ Math.round(Math.pow((player.upgrades.dps + 1), salesEffect(player.heroes[2]))) }}  Coins</button> <br>
+<button id="IncreaseDPS" onclick="buyCoinUpgrade(1)"> Increase base Auto Damage by 2 for {{ Math.round(Math.pow(salesEffect(player.heroes[2]), player.upgrades.dps+2)/Math.sqrt(5)) }}  Coins</button> <br>
 <br>
 <br>
 </div>
