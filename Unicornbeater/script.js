@@ -94,7 +94,7 @@ function determineUnicornType() {
 }
 
 function dealDamage(type) {
-    let damage = type?player.upgrades.dps:player.upgrades.click+1
+    let damage = type?player.upgrades.dps*2:player.upgrades.click+1
     damage = Math.floor((1 + strengthEffect(player.heroes[1]) / 100)*damage)
     game.damageDealt += damage;
     if (game.damageDealt >= unicornHP()) {
