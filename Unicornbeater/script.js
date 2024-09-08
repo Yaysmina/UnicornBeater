@@ -173,12 +173,12 @@ function getRandomhero() {
 function buyCoinUpgrade(type){
 if(type==0){
 do{
-let cost = Math.round(Math.pow((player.upgrades.click + 1), salesEffect(player.heroes[2])));
+let cost = Math.round(Math.pow(salesEffect(player.heroes[2]), player.upgrades.click));
 if(player.coins>=cost){
 player.coins-=cost
 player.upgrades.click++
 }
-}while(player.maxBuy&&player.coins>=Math.round(Math.pow((player.upgrades.click + 1), salesEffect(player.heroes[2]))))
+}while(player.maxBuy&&player.coins>=Math.round(Math.pow(salesEffect(player.heroes[2]), player.upgrades.click)))
 }
 
 if(type==1)
