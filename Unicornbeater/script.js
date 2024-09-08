@@ -152,7 +152,8 @@ function strengthEffect(x = player.heroes[1]) {
 }
 
 function salesEffect(x = player.heroes[2]) {
-    let n = 1 + 1 / (1 + Math.pow(x, 2/3)*1.5 / 5);
+    //let n = 1 + 1 / (1 + Math.pow(x, 2/3)*1.5 / 5);
+    let n = 1.61803399
     return Math.round(1000 * n) / 1000;
 }
 
